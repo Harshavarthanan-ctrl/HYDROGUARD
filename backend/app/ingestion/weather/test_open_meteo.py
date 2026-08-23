@@ -1,6 +1,13 @@
 import asyncio
+import logging
 
 from .open_meteo import OpenMeteoProvider
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s",
+)
 
 
 async def main():
@@ -11,7 +18,7 @@ async def main():
         longitude=80.2707,
     )
 
-    print(f"Received {len(observations)} observations")
+    print(f"\nReceived {len(observations)} observations\n")
 
     for observation in observations[:3]:
         print(observation.model_dump())
