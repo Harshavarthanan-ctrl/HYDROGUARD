@@ -1,0 +1,22 @@
+services:
+
+  postgis:
+    image: postgis/postgis:17-3.5
+
+    container_name: hydroguard-postgis
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: hydroguard
+      POSTGRES_USER: hydroguard
+      POSTGRES_PASSWORD: hydroguard_dev
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - hydroguard_postgis_data:/var/lib/postgresql/data
+
+volumes:
+  hydroguard_postgis_data:
