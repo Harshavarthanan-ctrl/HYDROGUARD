@@ -1,13 +1,20 @@
-from backend.app.ingestion.gis.gcc.client import fetch_drainage_geojson
+from backend.app.ingestion.gis.gcc.client import (
+    fetch_drainage_batch,
+)
 from backend.app.ingestion.gis.gcc.processor import (
     process_drainage_geojson,
 )
 
 
 def test_gcc_drainage_processing():
-    geojson = fetch_drainage_geojson(limit=5)
+    geojson = fetch_drainage_batch(
+    offset=0,
+    batch_size=5,
+)
 
-    gdf = process_drainage_geojson(geojson)
+    gdf = process_drainage_geojson(
+        geojson
+    )
 
     assert len(gdf) == 5
     assert gdf.crs.to_string() == "EPSG:4326"
