@@ -92,3 +92,9 @@ def test_build_drainage_features():
     assert result["cross_section_area_m2"] == 0.04
     assert result["has_obstacle"] is True
     assert result["infrastructure_score"] == 100
+    
+def test_calculate_cross_section_area_rejects_non_finite_values():
+    assert calculate_cross_section_area(float("nan"), 1.0) is None
+    assert calculate_cross_section_area(1.0, float("nan")) is None
+    assert calculate_cross_section_area(float("inf"), 1.0) is None
+    assert calculate_cross_section_area(1.0, float("inf")) is None

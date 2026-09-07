@@ -1,10 +1,15 @@
 from fastapi import FastAPI
 
+from backend.app.api.risk import router as risk_router
+
+
 app = FastAPI(
     title="HydroGuard AI",
     description="Real-Time Urban Flood Intelligence & Response Platform",
     version="0.1.0",
 )
+
+app.include_router(risk_router)
 
 
 @app.get("/")

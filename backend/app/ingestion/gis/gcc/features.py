@@ -1,15 +1,21 @@
+import math
+
+
 def calculate_cross_section_area(
     width_m: float | None,
     depth_m: float | None,
 ) -> float | None:
+    """Calculate rectangular drainage cross-sectional area in square metres."""
     if width_m is None or depth_m is None:
+        return None
+
+    if not math.isfinite(width_m) or not math.isfinite(depth_m):
         return None
 
     if width_m <= 0 or depth_m <= 0:
         return None
 
     return round(width_m * depth_m, 6)
-
 
 def calculate_infrastructure_score(
     *,

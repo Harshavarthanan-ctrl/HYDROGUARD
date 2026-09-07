@@ -2,7 +2,10 @@ import time
 
 import httpx
 
-
+GCC_WARD_LAYER_URL = (
+    "https://gisgcc.chennaicorporation.gov.in/server/rest/services/"
+    "GCCDepts/GCC_COLLABORATION_LAYER/MapServer/6"
+)
 GCC_DRAIN_LAYER_URL = (
     "https://gisgcc.chennaicorporation.gov.in/server/rest/services/"
     "GCCDepts/GCC_COLLABORATION_LAYER/MapServer/8"

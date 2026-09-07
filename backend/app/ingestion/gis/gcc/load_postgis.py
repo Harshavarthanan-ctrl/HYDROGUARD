@@ -2,7 +2,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import psycopg
-
+from .features import calculate_cross_section_area
 
 GPKG_PATH = Path(
     "data/processed/gcc/storm_water_drain.gpkg"
@@ -128,17 +128,6 @@ def normalize_drain_detail(value):
     return value
 
 
-def calculate_cross_section_area(
-    width,
-    depth,
-):
-    if width is None or depth is None:
-        return None
-
-    if width <= 0 or depth <= 0:
-        return None
-
-    return width * depth
 
 
 def normalize_geometry(geometry):
