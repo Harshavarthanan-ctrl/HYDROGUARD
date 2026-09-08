@@ -56,6 +56,8 @@ def test_missing_drainage_wards_have_null_risk():
     for ward in missing_drainage:
         assert ward["hydroguard_risk_index"] is None
         assert ward["risk_category"] is None
+
+
 def test_individual_ward_risk():
     response = client.get("/api/v1/risk/wards/085")
 
@@ -91,3 +93,20 @@ def test_ward_without_drainage_data():
     assert data["drainage_vulnerability"] is None
     assert data["hydroguard_risk_index"] is None
     assert data["risk_category"] is None
+
+
+def test_invalid_ward_format_returns_400():
+    response = client.get("/api/v1/risk/wards/abc")
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Ward must be a valid numeric ward ID."
+
+
+def test_ward_is_zero_padded():
+    response = client.get("/api/v1/risk/wards/85")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["ward"] == "085"
