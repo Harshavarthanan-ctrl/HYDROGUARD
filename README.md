@@ -287,12 +287,6 @@ for operational decisions.
 4.  Run the test suite.
 5.  Submit a pull request describing the change and its limitations.
 
-## License
-
-No license is specified. Add a `LICENSE` file before presenting the
-repository as open source. Ensure third-party data and assets are used
-according to their respective terms.
-
 ------------------------------------------------------------------------
 
 **Built as an urban flood-intelligence prototype for Chennai, India.**
