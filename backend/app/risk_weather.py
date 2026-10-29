@@ -1,52 +1,72 @@
 """
-Weather hazard scoring for HydroGuard.
+HydroGuard weather hazard calculation.
 
-This module converts forecast precipitation into a bounded 0-100
-weather hazard score.
+This module converts rainfall observations into a 0-100
+weather hazard index.
 
-The thresholds are configurable and are intentionally treated as
-heuristic design parameters, not calibrated flood probabilities.
+The thresholds are heuristic v1 design values, not
+scientifically calibrated flood probabilities.
 """
-
-
-# 48-hour accumulated precipitation thresholds (mm)
-TOTAL_RAIN_LOW_MM = 25.0
-TOTAL_RAIN_MODERATE_MM = 50.0
-TOTAL_RAIN_HIGH_MM = 100.0
-
-# Maximum hourly precipitation thresholds (mm)
-HOURLY_RAIN_LOW_MM = 10.0
-HOURLY_RAIN_MODERATE_MM = 25.0
-HOURLY_RAIN_HIGH_MM = 50.0
 
 
 def _severity(
     value: float | None,
-    low: float,
-    moderate: float,
-    high: float,
+    breakpoints: list[tuple[float, float]],
 ) -> float:
     """
-    Convert a precipitation value into a 0-1 severity score.
-
-    0 at/below low threshold.
-    0.5 at moderate threshold.
-    1.0 at/above high threshold.
-    Linear interpolation is used between thresholds.
+    Convert a measurement into a 0-1 severity using
+    piecewise-linear interpolation.
     """
     if value is None:
         return 0.0
 
-    if value <= low:
-        return 0.0
+    if value <= breakpoints[0][0]:
+        return breakpoints[0][1]
 
-    if value <= moderate:
-        return 0.5 * (value - low) / (moderate - low)
+    for (x1, y1), (x2, y2) in zip(
+        breakpoints,
+        breakpoints[1:],
+    ):
+        if value <= x2:
+            if x2 == x1:
+                return y2
 
-    if value <= high:
-        return 0.5 + 0.5 * (value - moderate) / (high - moderate)
+            ratio = (value - x1) / (x2 - x1)
+            return y1 + ratio * (y2 - y1)
 
-    return 1.0
+    return breakpoints[-1][1]
+
+
+# Heuristic v1 rainfall response curve.
+#
+# Total accumulated rainfall:
+# 0 mm   -> 0%
+# 5 mm   -> 10%
+# 25 mm  -> 35%
+# 50 mm  -> 65%
+# 100 mm -> 100%
+TOTAL_RAIN_BREAKPOINTS = [
+    (0.0, 0.0),
+    (5.0, 0.10),
+    (25.0, 0.35),
+    (50.0, 0.65),
+    (100.0, 1.0),
+]
+
+
+# Maximum hourly rainfall:
+# 0 mm   -> 0%
+# 2 mm   -> 10%
+# 10 mm  -> 35%
+# 25 mm  -> 65%
+# 50 mm  -> 100%
+HOURLY_RAIN_BREAKPOINTS = [
+    (0.0, 0.0),
+    (2.0, 0.10),
+    (10.0, 0.35),
+    (25.0, 0.65),
+    (50.0, 1.0),
+]
 
 
 def calculate_weather_hazard(
@@ -54,31 +74,30 @@ def calculate_weather_hazard(
     max_hourly_precipitation_mm: float | None,
 ) -> float:
     """
-    Calculate a 0-100 weather hazard score.
+    Calculate a 0-100 weather hazard index.
 
-    Weighting:
-        60% = 48-hour accumulated precipitation
-        40% = maximum hourly precipitation
+    The index combines:
+      - 60% accumulated rainfall severity
+      - 40% peak hourly rainfall severity
 
-    This is a heuristic hazard index, NOT a probability of flooding.
+    This is a heuristic indicator for HydroGuard v1.
+    It is NOT a flood probability or scientifically
+    calibrated prediction.
     """
+
     total_severity = _severity(
         total_precipitation_mm,
-        TOTAL_RAIN_LOW_MM,
-        TOTAL_RAIN_MODERATE_MM,
-        TOTAL_RAIN_HIGH_MM,
+        TOTAL_RAIN_BREAKPOINTS,
     )
 
     hourly_severity = _severity(
         max_hourly_precipitation_mm,
-        HOURLY_RAIN_LOW_MM,
-        HOURLY_RAIN_MODERATE_MM,
-        HOURLY_RAIN_HIGH_MM,
+        HOURLY_RAIN_BREAKPOINTS,
     )
 
-    score = (
+    hazard = (
         0.60 * total_severity
         + 0.40 * hourly_severity
     )
 
-    return round(score * 100.0, 2)
+    return round(hazard * 100, 2)

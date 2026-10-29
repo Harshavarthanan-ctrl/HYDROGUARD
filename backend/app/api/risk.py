@@ -1,7 +1,7 @@
 """
 HydroGuard risk API endpoints.
 """
-
+from backend.app.risk_zone_names import get_zone_name
 import json
 
 import psycopg
@@ -22,7 +22,7 @@ DATABASE_URL = (
 class WardRiskResponse(BaseModel):
     ward: str
     zone: str | None
-
+    zone_name: str | None
     # Risk
     weather_hazard: float | None
     drainage_vulnerability: float | None
@@ -68,7 +68,7 @@ def row_to_ward_risk(row) -> WardRiskResponse:
     return WardRiskResponse(
         ward=row[0],
         zone=row[1],
-
+        zone_name=get_zone_name(row[1]),
         # Risk
         weather_hazard=row[2],
         drainage_vulnerability=row[3],
