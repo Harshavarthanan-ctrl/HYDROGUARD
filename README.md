@@ -289,9 +289,7 @@ for operational decisions.
 
 ## License
 
-No license is specified. Add a `LICENSE` file before presenting the
-repository as open source. Ensure third-party data and assets are used
-according to their respective terms.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ------------------------------------------------------------------------
 
